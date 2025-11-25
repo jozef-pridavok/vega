@@ -1,0 +1,79 @@
+name: core_flutter
+description: A new Flutter package project.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependency_overrides:
+  intl: any
+  collection: any
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  core_dart:
+    path: ../core_dart
+    #git:
+    #  url: git@gitlab.vega.com:vega/core_dart.git
+    #  ref: "refs/tags/241105.002"
+
+  #intl: ^0.17.0 # flutter_localizations depends on 0.17.0,
+  intl: ^0.19.0
+  collection: ^1.19.0
+
+  package_info_plus: ^8.0.0
+  device_info_plus: ^10.0.1
+  #permission_handler: ^11.0.1
+
+  dio: 5.2.1
+
+  flutter_svg: ^2.0.10
+  flutter_riverpod: ^2.5.1
+  hive_flutter: ^1.1.0
+
+  focus_detector: ^2.0.1
+
+  easy_refresh: ^3.4.0
+  custom_refresh_indicator: ^3.1.0
+  buttons_tabbar: 1.3.6 # TODO: ^1.3.11
+  image: ^4.0.17
+
+  barcode: ^2.2.8
+  # mobile_scanner: ^5.2.1
+  mobile_scanner: ^6.0.1
+
+  url_launcher: ^6.3.0
+  app_settings: ^5.1.1
+
+  # TODO upgrade to 4.2.2+
+  webview_flutter: ^4.8.0
+
+  #firebase_core: 3.1.0
+  #firebase_messaging: 15.0.1
+
+  latlong2: ^0.9.1
+  flutter_map: ^7.0.1
+  flutter_map_location_marker: ^9.1.1
+
+  flutter_colorpicker: ^1.1.0
+
+  table_calendar: ^3.1.2
+
+  cached_network_image: ^3.4.1
+
+dev_dependency_overrides:
+  flutter_test: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+#eof

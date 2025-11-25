@@ -6,7 +6,7 @@
 *.swp
 .buildlog/
 .history
-
+.DS_Store
 
 
 # Flutter repo-specific
@@ -56,6 +56,8 @@ unlinked_spec.ds
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+*.keystore
+**/android/fastlane/*.json
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -86,6 +88,12 @@ unlinked_spec.ds
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+*.p8
+*.p12
+*.pem
+*.cer
+*.certSigningRequest
+*.mobileprovision
 
 # macOS
 **/Flutter/ephemeral/
@@ -117,3 +125,21 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Sensitive configuration files
+config.dev.yaml
+config.qa.yaml
+config.demo.yaml
+config.prod.yaml
+config.yaml
+dev.env
+qa.env
+demo.env
+prod.env
+.env
+!.env.sample
+!*.env.sample
+
+# Firebase and Google Cloud credentials (keep empty placeholder files)
+fcm_app_key*.json
+/fcm-api/node_modules

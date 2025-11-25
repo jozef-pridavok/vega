@@ -1,0 +1,28 @@
+@proto = {{$dotenv PROTO}}
+@host = {{$dotenv HOST}}
+@key = {{$dotenv API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+
+### Ping Prod
+
+GET https://capi.vega.intra/ping
+
+### Ping Demo
+
+GET https://vega-demo-capi.vega.com/ping
+
+
+### Ping QA
+
+GET http://vega-qa-capi.brokenmatrix.intra/ping
+
+
+### Ping Dev
+
+GET http://vega-dev-capi.brokenmatrix.intra/ping
+
+###

@@ -1,0 +1,22 @@
+
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Update currency rates
+
+GET {{proto}}://{{host}}/v1/currencyRates/update HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+
+### Update currency rates, call remote api
+
+GET http://vega-dev-capi.brokenmatrix.intra/v1/currencyRates/update
+Content-Type: application/json
+X-API-Key: {{key}}
+
+# eof

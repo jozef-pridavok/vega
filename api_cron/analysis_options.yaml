@@ -1,0 +1,8 @@
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    curly_braces_in_flow_control_structures: false
+    prefer_double_quotes: true
+    unawaited_futures: true
+# eof

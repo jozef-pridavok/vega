@@ -1,0 +1,35 @@
+@proto = {{$dotenv PROTO}}
+@host = {{$dotenv HOST}}
+@key = {{$dotenv API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Ping Prod
+
+GET https://api.vega.com/ping HTTP/1.1
+
+### Ping Demo
+
+GET https://vega-demo-mapi.vega.com/ping
+
+
+### Ping QA
+
+GET https://vega-qa-mapi.vega.com/ping
+
+### Ping Dev
+
+GET https://vega-dev-mapi.vega.com/ping
+
+### Check role
+
+GET {{proto}}://{{host}}/v1/dashboard/coupon HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+###

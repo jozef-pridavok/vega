@@ -1,0 +1,27 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Create message for delivery
+
+POST {{proto}}://{{host}}/v1/message/?target=1,2 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+    "subject": "Hello {{name}}",
+    "body": "Today is {{day}}, hello {{fullname}}",
+    "fromParticipant": 1,
+    "toParticipant": 2,
+    "toId": "client1",
+    "payload": {
+        "day": "monday",
+        "name": "John",
+        "fullname": "John Smith"
+    }
+}

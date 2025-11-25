@@ -1,0 +1,166 @@
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+
+  ###############################################################################
+  ###
+  ### Dev
+
+  ### CI_PIPELINE_ID=1 APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane build_dev
+
+  lane :build_dev do
+    scheme = "dev"
+    version_number = "1.0"
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Build number: " + build_number
+    puts "Version number: " + version_number
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version_number,
+        "--build-number", build_number,
+        "--flavor", "dev", "./lib/main_dev.dart"
+      )
+    end
+    xcodeproj = "Runner.xcodeproj"
+    workspace = "Runner.xcworkspace"
+    increment_version_number(version_number: version_number, xcodeproj: xcodeproj)
+    increment_build_number(build_number: build_number, xcodeproj: xcodeproj)    
+    build_app(workspace: workspace, scheme: scheme, export_xcargs: "-allowProvisioningUpdates")
+  end
+
+  ### CI_PIPELINE_ID=1 LAST_GIT_TAG=dev_0.9_230803a APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane deploy_dev_apple
+
+  lane :deploy_dev_apple do
+    app_store_connect_api_key(
+      key_id: ENV['ASC_KEY_ID'],
+      issuer_id: ENV['ASC_ISSUER_ID'],
+      key_filepath: "./api_key.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+    upload_to_testflight(ipa: "../../output/vega_app-dev.ipa", skip_waiting_for_build_processing: true)
+  end
+
+  ###############################################################################
+  ###
+  ### Qa
+  ###
+
+  lane :build_qa do
+    scheme = "qa"
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "qa", "./lib/main_qa.dart"
+      )
+    end
+    xcodeproj = "Runner.xcodeproj"
+    workspace = "Runner.xcworkspace"
+    increment_version_number(version_number: version, xcodeproj: xcodeproj)
+    increment_build_number(build_number: build_number, xcodeproj: xcodeproj)    
+    build_app(workspace: workspace, scheme: scheme, export_xcargs: "-allowProvisioningUpdates")
+  end
+
+  lane :deploy_qa_apple do
+    app_store_connect_api_key(
+      key_id: ENV['ASC_KEY_ID'],
+      issuer_id: ENV['ASC_ISSUER_ID'],
+      key_filepath: "./api_key.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+    upload_to_testflight(ipa: "../../output/vega_app-qa.ipa", skip_waiting_for_build_processing: true)
+  end
+  
+  ###############################################################################
+  ###
+  ### Demo
+  ###
+
+  lane :build_demo do
+    scheme = "demo"
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "demo", "./lib/main_demo.dart"
+      )
+    end
+    xcodeproj = "Runner.xcodeproj"
+    workspace = "Runner.xcworkspace"
+    increment_version_number(version_number: version, xcodeproj: xcodeproj)
+    increment_build_number(build_number: build_number, xcodeproj: xcodeproj)    
+    build_app(workspace: workspace, scheme: scheme, export_xcargs: "-allowProvisioningUpdates")
+  end
+
+  lane :deploy_demo_apple do
+    app_store_connect_api_key(
+      key_id: ENV['ASC_KEY_ID'],
+      issuer_id: ENV['ASC_ISSUER_ID'],
+      key_filepath: "./api_key.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+    upload_to_testflight(ipa: "../../output/vega_app-demo.ipa", skip_waiting_for_build_processing: true)
+  end
+
+  ###############################################################################
+  ###
+  ### Prod
+  ###
+
+  lane :build_prod do
+    scheme = "prod"
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "prod", "./lib/main_prod.dart"
+      )
+    end
+    xcodeproj = "Runner.xcodeproj"
+    workspace = "Runner.xcworkspace"
+    increment_version_number(version_number: version, xcodeproj: xcodeproj)
+    increment_build_number(build_number: build_number, xcodeproj: xcodeproj)
+    build_app(workspace: workspace, scheme: scheme, export_xcargs: "-allowProvisioningUpdates")
+  end
+
+  lane :deploy_prod_apple do
+    app_store_connect_api_key(
+      key_id: ENV['ASC_KEY_ID'],
+      issuer_id: ENV['ASC_ISSUER_ID'],
+      key_filepath: "./api_key.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+    upload_to_testflight(ipa: "../../output/vega_app-prod.ipa", skip_waiting_for_build_processing: true)
+  end
+
+end
+
+# eof

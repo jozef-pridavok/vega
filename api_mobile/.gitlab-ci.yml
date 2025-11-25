@@ -1,0 +1,9 @@
+include:
+  - local: "cicd/*.yaml"
+
+stages:
+  - lint
+  - test
+  - init
+  - build
+  - deploy

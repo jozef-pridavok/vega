@@ -1,0 +1,32 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "resolveJsonModule": true,
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "paths": {
+      "#enums/*": ["./enums/*"],
+      "#guards/*": ["./guards/*"],
+      "#middlewares/*": ["./middlewares/*"],
+      "#models/*": ["./models/*"],
+      "#routes/*": ["./routes/*"],
+      "#services/*": ["./services/*"],
+      "#types/*": ["./types/*"],
+      "#utils/*": ["./utils/*"],
+      "#src/*": ["./*"]
+    }
+  }
+}

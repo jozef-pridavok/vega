@@ -1,0 +1,27 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+@dev_user_id = {{$dotenv %DEV_USER_ID}}
+@dev_installation_id = {{$dotenv %DEV_INSTALLATION_ID}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Get user cards
+
+GET {{proto}}://{{host}}/v1/dashboard/client/user_card?period=-1
+Content-Type: application/json
+X-API-Key: {{key}}
+x-dev-user-id: {{dev_user_id}}
+x-dev-installation-id: {{dev_installation_id}}
+
+### Get user card transactions
+
+GET {{proto}}://{{host}}/v1/dashboard/client/user_card/transaction?userCard=uc11
+Content-Type: application/json
+X-API-Key: {{key}}
+x-dev-user-id: {{dev_user_id}}
+x-dev-installation-id: {{dev_installation_id}}
+
+# eof

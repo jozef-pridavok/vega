@@ -1,0 +1,51 @@
+host: localhost
+port: 8080
+environment: dev
+build: 1
+local_path: /Users/neo/Work/Vega/api_mobile/ # Use /app/ for Docker, for local use ./ or local path to the project
+mobile_api_host: https://vega-dev-mapi.vega.com/ # Use http://localhost:8080/ for local
+cron_api_host: http://vega-dev-capi.brokenmatrix.intra/
+
+log:
+  error: true
+  warning: true
+  debug: true
+  verbose: true
+
+redis:
+  host: redis.server.local
+  port: 6379
+  database: 0
+
+postgres:
+  host: postgres.server.local
+  port: 5432
+  username: db_user
+  password: password123
+  database: db_name
+
+storage:
+  path: /tmp/images/
+  dev2local: http://localhost:8080/
+
+security:
+  receipt_password: secret123
+  qr_code_key: codeKey123
+  qr_code_env: d
+  jwt_secret: secret123
+  jwt_access_token_expiration_minutes: 120
+  jwt_refresh_token_expiration_days: 365
+
+whatsapp:
+  client_id: client_id
+  client_secret: client_secret
+  config_id: config_id
+
+keys:
+  v1: key1
+  v2: key2
+
+3rd:
+  jesoft_key: key
+  addresses: 127.0.0.1
+# eof

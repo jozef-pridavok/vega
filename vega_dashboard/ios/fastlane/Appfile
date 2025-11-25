@@ -1,0 +1,8 @@
+app_identifier(ENV["APP_IDENTIFIER"] || "com.vega.dashboard.dev")
+apple_id("support@vega.com")
+
+itc_team_id("126241611")
+team_id(ENV["ASC_TEAM_ID"])
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

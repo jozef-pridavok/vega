@@ -1,0 +1,39 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### Ping Prod
+
+GET http://capi.vega.intra/ping
+
+### Ping Demo
+
+GET http://vega-demo-capi.brokenmatrix.intra/ping
+
+
+### Ping QA
+
+GET http://vega-qa-capi.brokenmatrix.intra/ping
+
+### Ping Dev
+
+GET http://vega-dev-capi.brokenmatrix.intra/ping
+
+### Process batch of delivery messages
+
+GET {{proto}}://{{host}}/v1/delivery_messages?batch=100
+Content-Type: application/json
+X-API-Key: {{key}}
+
+
+### Process batch of delivery messages
+
+GET http://vega-dev-capi.brokenmatrix.intra/v1/delivery_messages?batch=100
+Content-Type: application/json
+X-API-Key: {{key}}
+
+### eof

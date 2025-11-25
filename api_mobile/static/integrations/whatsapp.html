@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vega</title>
+    <style>
+        .loader {
+            display: none;
+        }
+    </style>
+    <script>
+        window.fbAsyncInit = function () {
+            console.log("Initializing Facebook SDK");
+            const urlParams = new URLSearchParams(window.location.search);
+            const fbAppId = urlParams.get('f');
+
+            if (!fbAppId) {
+                showError("Missing Facebook App ID");
+                return;
+            }
+
+            FB.init({
+                appId: fbAppId,
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v20.0'
+            });
+            console.log("Facebook SDK initialized, checking login status");
+            FB.getLoginStatus(launchWhatsAppSignup);
+        };
+    </script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js">
+    </script>
+</head>
+
+<body style="background: #fff;">
+    <div id="fb-root"></div>
+    <div id="loader" class="loader">Connecting your WhatsApp account...</div>
+
+    <script>
+        let wabaId;
+        let phoneNumberId;
+        let exchangeToken;
+        let handlingApiCall = false;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const apiUrl = urlParams.get('u');
+        const apiKey = urlParams.get('k');
+        const accessToken = urlParams.get('t');
+        const configId = urlParams.get('c');
+
+        console.log("URL parameters:", {
+            apiUrl: apiUrl?.substring(0, 20) + "...",
+            hasApiKey: !!apiKey,
+            hasAccessToken: !!accessToken
+        });
+
+        function showError(message) {
+            document.getElementById('loader').style.display = 'none';
+            alert(message || "An error occurred. Please try again later.");
+            window.close();
+        }
+
+        function showSuccess() {
+            document.getElementById('loader').style.display = 'none';
+            alert("Successfully connected your WhatsApp account.");
+            window.close();
+        }
+
+        if (!apiUrl || !apiKey || !accessToken || !configId) {
+            showError("Missing configuration parameters");
+            throw new Error("Missing required parameters");
+        }
+
+        window.addEventListener('message', (event) => {
+            console.log("Received message from:", event.origin);
+
+            if (event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") {
+                console.warn("Ignored message from unauthorized origin:", event.origin);
+                return;
+            }
+            try {
+                const data = JSON.parse(event.data);
+                console.log("Received WhatsApp event:", data.type, data.event);
+
+                if (data.type === 'WA_EMBEDDED_SIGNUP') {
+                    if (data.event === 'FINISH') {
+                        console.log("WhatsApp setup finished");
+                        phoneNumberId = data.data.phone_number_id;
+                        wabaId = data.data.waba_id;
+                        handleApiCall();
+                    } else if (data.event === 'CANCEL') {
+                        const { current_step } = data.data;
+                        console.warn("WhatsApp setup cancelled at step:", current_step);
+                        showError("WhatsApp setup was cancelled");
+                    } else if (data.event === 'ERROR') {
+                        const { error_message } = data.data;
+                        console.error("WhatsApp setup error:", error_message);
+                        showError(error_message);
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to parse message:', event.data, e);
+            }
+        });
+
+        const fbLoginCallback = (response) => {
+            console.log("Facebook login callback received:", response.status);
+            if (response.authResponse) {
+                console.log("Facebook auth successful");
+                exchangeToken = response.authResponse.code;
+                handleApiCall();
+            } else {
+                console.error("Facebook auth failed:", response);
+                showError("Facebook authentication failed");
+            }
+        }
+
+        const launchWhatsAppSignup = () => {
+            console.log("Launching WhatsApp signup");
+            document.getElementById('loader').style.display = 'block';
+            FB.login(fbLoginCallback, {
+                config_id: configId,
+                response_type: 'code',
+                override_default_response_type: true,
+                extras: {
+                    setup: {},
+                    featureType: '',
+                    sessionInfoVersion: '2',
+                }
+            });
+        }
+
+        const handleApiCall = async () => {
+            if (!(exchangeToken && phoneNumberId && wabaId) || handlingApiCall) {
+                console.log("Skipping API call:", {
+                    hasExchangeToken: !!exchangeToken,
+                    hasPhoneNumberId: !!phoneNumberId,
+                    hasWabaId: !!wabaId,
+                    isHandling: handlingApiCall
+                });
+                return;
+            }
+
+            console.log("Starting API call with:", {
+                wabaId,
+                phoneNumberId,
+                exchangeTokenLength: exchangeToken?.length
+            });
+
+            handlingApiCall = true;
+            document.getElementById('loader').style.display = 'block';
+
+            try {
+                console.log("Making API request to:", apiUrl + '/v1/integrations/whatsapp');
+                const response = await fetch(apiUrl + '/v1/integrations/whatsapp', {
+                    body: JSON.stringify({ 'wabaId': wabaId, 'phoneNumberId': phoneNumberId, 'exchangeToken': exchangeToken }),
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey,
+                        'Authorization': 'Bearer ' + accessToken
+                    }
+                });
+
+                console.log("API response status:", response.status);
+                if (response.ok) {
+                    showSuccess();
+                } else {
+                    const error = await response.text();
+                    console.error("API error response:", error);
+                    throw new Error(error);
+                }
+            } catch (e) {
+                console.error("API call failed:", e);
+                showError(e.message);
+            } finally {
+                handlingApiCall = false;
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

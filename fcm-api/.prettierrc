@@ -1,0 +1,25 @@
+{
+  "overrides": [
+    {
+      "files": ["*.vue", "*.ts", "*.js"],
+      "options": {
+        "tabWidth": 4,
+        "endOfLine": "auto"
+      }
+    },
+    {
+      "files": ["*.css", "*.scss", "*.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": "*",
+      "options": {
+        "printWidth": 100,
+        "useTabs": false,
+        "trailingComma": "es5"
+      }
+    }
+  ]
+}

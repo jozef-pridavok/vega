@@ -1,0 +1,27 @@
+@proto = http
+@port = 8000
+@host = localhost:{{port}}
+@key_devdev = a25fc68c-45c7-4d1f-a272-b609484d6c0b
+
+##################################################
+
+### Ping + get version tag
+
+GET {{proto}}://{{host}}/ping  HTTP/1.1
+Content-Type: application/json
+
+### POST - send one / multiple push messages to specified device_tokens
+
+POST {{proto}}://{{host}}/v1/message/  HTTP/1.1
+Content-Type: application/json
+X-Api-Key: {{key_devdev}}
+
+{
+    "tokens": [
+        "sd2XpjjEPO0kutrtCzhrGrS:APA91bGslVE6oGSpOlzqcTAZQ0rgkaUzLP8rD3_HibEgv9fYhI1pATBjFuwPX_8SS8JOF4Z5550-ZruP2_VUEJyn52G5FwEUAL40tu4KeIhuebGvsoYGV1qVC1l4yUe6LHXd9-UtCkaz",
+        "scxMNaBKhGkdKimFN2S2rsj:APA91bGBiEv0LgXB6OOTPJJochwHAI2Q5mzc1zMhgzldNJLZMB2b7OpQ1nYDKFC2zdFmHP9vTsyZn8bPmU_3nldCKcruUJoURp0Fhfhi_n7jTlkru1Se5TCVY8AENXNHtzS1_WqCrz4x"
+    ],
+    "pushTitle": "Push Test",
+    "pushBody": "Hello, this is push test",
+    "payload": {}
+}

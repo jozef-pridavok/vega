@@ -1,0 +1,45 @@
+<html>
+
+<head>
+    <title>Vega Cards</title>
+    <link href="{{mobileApiHost}}/public/templates/styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <h3 class="padding-all title">
+        <img src="{{mobileApiHost}}/public/templates/vega_cards_rounded_transparent.png" class="logo">
+        <span>
+            {{translate("html_link_expired_title")}}
+        </span>
+    </h3>
+    <div class="padding-all">
+        <p class="padding-bottom">{{translate("html_link_expired_body")}}</p>
+    </div>
+    <div class="padding-all">
+    </div>
+    <div class="footer">
+        Vega Cards &copy; 2024
+    </div>
+</body>
+
+<!-- /debug -->
+
+<script defer="true">
+    var base = "{{mobileApiHost}}";
+    if (base.startsWith("{") && base.endsWith("}")) {
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; i++) {
+            var src = unescape(images[i].src);
+            images[i].src = src.replace("{{mobileApiHost}}/public/templates", "..");
+        }
+        var links = document.getElementsByTagName('link');
+        for (var i = 0; i < links.length; i++) {
+            var href = unescape(links[i].href);
+            links[i].href = href.replace("{{mobileApiHost}}/public/templates", "..");
+        }
+    }
+</script>
+
+<!-- debug/ -->
+
+</html>

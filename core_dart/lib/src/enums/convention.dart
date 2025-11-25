@@ -1,0 +1,1 @@
+enum Convention { camel, snake }

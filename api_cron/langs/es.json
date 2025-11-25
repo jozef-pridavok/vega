@@ -1,0 +1,8 @@
+{
+    "html_notify_reservation_title": "Recordatorio de reserva",
+    "html_notify_reservation_message": "Tu reserva se acerca...",
+    "html_notify_reservation_slot_name": "Servicio: {service}",
+    "html_notify_reservation_date_time": "Fecha y hora: {term}",
+    "html_notify_reservation_location": "Ubicación: {location}",
+    "html_notify_reservation_price": "Precio: {price}"
+}

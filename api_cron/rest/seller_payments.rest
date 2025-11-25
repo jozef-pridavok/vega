@@ -1,0 +1,16 @@
+
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Recalculate payments for sellers
+
+GET {{proto}}://{{host}}/v1/seller/payment/recalculate
+Content-Type: application/json
+X-API-Key: {{key}}
+
+# eof

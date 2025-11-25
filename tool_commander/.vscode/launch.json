@@ -1,0 +1,156 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "VTC version",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "version"
+            ]
+        },
+        {
+            "name": "VT psql version",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "psql",
+                "version"
+            ]
+        },
+        {
+            "name": "lang redis push",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "redis",
+                "--input",
+                "/Users/oxy/Work/Vega/vega_app"
+            ]
+        },
+        {
+            "name": "lang redis pull",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "redis",
+                "--pull",
+                "--input",
+                "/Users/oxy/Work/Vega/vega_app",
+                "--output",
+                "/Users/oxy/Work/Temp/"
+            ]
+        },
+        {
+            "name": "VT psql exec --command",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "psql",
+                "exec",
+                "--command",
+                "SELECT * FROM clients;",
+                "--pretty"
+            ]
+        },
+        {
+            "name": "VT psql exec --file",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "psql",
+                "exec",
+                "--file",
+                "./test/sql_select_version.sql"
+            ]
+        },
+        {
+            "name": "VT blur_hash e",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "blur_hash",
+                "encode",
+                "--url",
+                "http://via.placeholder.com/250x250"
+            ]
+        },
+        {
+            "name": "lang remove_unused --dry-run",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "remove_unused",
+                "--input",
+                "/Users/oxy/Work/Vega/vega_dashboard",
+                "--verbose",
+                "--dry-run"
+            ]
+        },
+        {
+            "name": "lang source --dry-run",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "source",
+                "--input",
+                "/Users/oxy/Work/Vega/vega_app",
+                "--verbose",
+                "--dry-run"
+            ]
+        },
+        {
+            "name": "lang export --dry-run",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "export",
+                "--input",
+                "/Users/oxy/Work/Vega/vega_app",
+                "--locale",
+                "es",
+                "--ref-locales",
+                "sk, en",
+                "--keys",
+                "colu*",
+                "--verbose",
+                "--dry-run"
+            ]
+        },
+        {
+            "name": "Update langs from Google Sheet",
+            "request": "launch",
+            "type": "dart",
+            "program": "./bin/vtc.dart",
+            "args": [
+                "lang",
+                "google-sheet",
+                "--url",
+                "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrXLETBaKTEMVNKFFKhsxSSiNAKGI5hoMTki5gYLqBrVVAlYFLBgpn27IsIC7noOq0DZnrEbap-bRv/pub?gid=1338362051&single=true&output=tsv",
+                "--keys",
+                "/Users/oxy/Work/Temp/_a/keys.dart",
+                "--output",
+                "/Users/oxy/Work/Temp/_a/",
+                "--pretty"
+            ]
+        }
+    ]
+}

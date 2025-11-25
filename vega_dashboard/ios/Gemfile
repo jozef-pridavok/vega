@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "cocoapods", ">=1.15.2"
+
+# bundle exec fastline version
+# bundle update fastlane 
+gem "fastlane", ">=2.219.0"

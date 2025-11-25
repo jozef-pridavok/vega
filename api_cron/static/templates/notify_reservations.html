@@ -1,0 +1,88 @@
+<html>
+
+<head>
+    <title>{{translate("html_confirm_email_title")}}</title>
+    <link href="{{mobileApiHost}}/public/templates/styles.css" rel="stylesheet" type="text/css">
+    <style>
+        .button {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .button-secondary {
+            border: 1px solid rgba(0, 132, 244, 1);
+            background: transparent;
+            color: rgba(0, 132, 244, 1);
+        }
+
+        .button-negative {
+            border: 0px none;
+            background: rgba(255, 100, 124, 1);
+            color: rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <h3 class="padding-all title">
+        <img src="{{clientLogo}}" width="100">
+        <span>
+            {{clientName}}: {{translate("html_notify_reservation_title")}}
+        </span>
+    </h3>
+    <div class="padding-all">
+        <p class="padding-bottom">{{translate("html_notify_reservation_message")}}</p>
+        <p class="padding-bottom">{{translate("html_notify_reservation_slot_name")}}</p>
+        <p class="padding-bottom">{{translate("html_notify_reservation_date_time")}}</p>
+        {{if hasValue("location")}}
+        <p class="padding-bottom">{{translate("html_notify_reservation_location")}}</p>
+        {{/if}}
+        <p class="padding-bottom">{{translate("html_notify_reservation_price")}}</p>
+    </div>
+    <div class="padding-all">
+        <a class="button" href="{{mobileApiHost}}/v1/user/reservation/confirm/{{token}}">{{translate("button_confirm")}}</a>
+        <a class="button button-secondary" href="{{mobileApiHost}}/v1/user/reservation/change/{{token}}">{{translate("button_change")}}</a>
+        <a class="button button-negative" href="{{mobileApiHost}}/v1/user/reservation/cancel/{{token}}">{{translate("button_cancel")}}</a>
+    </div>
+    <div class="padding-all">
+    </div>
+    <div class="footer">
+        Vega Cards &copy; 2024
+    </div>
+</body>
+
+<!-- /debug -->
+
+<script defer="true">
+    {
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; i++) {
+            if (unescape(images[i].src).includes("{{clientLogo}}")) {
+                images[i].src = "https://vega-dev-static.vega.com/client/logo_client1.jpeg";
+            }
+        }
+    }
+    var base = "{{mobileApiHost}}";
+    if (base.startsWith("{") && base.endsWith("}")) {
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; i++) {
+            let src = unescape(images[i].src);
+            let baseIndex = src.indexOf(base);
+            if (baseIndex == -1) continue;
+            let path = src.substring(baseIndex + base.length);
+            //images[i].src = "https://vega-dev-mapi.vega.com" + path;
+        }
+        var links = document.getElementsByTagName('link');
+        for (var i = 0; i < links.length; i++) {
+            let href = unescape(links[i].href);
+            let baseIndex = href.indexOf(base);
+            let path = href.substring(baseIndex + base.length);
+            if (baseIndex == -1) continue;
+            links[i].href = "https://vega-dev-mapi.vega.com" + path;
+        }
+    }
+</script>
+
+<!-- debug/ -->
+
+</html>

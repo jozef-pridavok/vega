@@ -1,0 +1,2 @@
+json_key_file("./fastlane/pc-api-5329944095363457023-858-01859c3a6010.json")
+package_name(ENV["APP_IDENTIFIER"] || "com.vega.dashboard.dev")

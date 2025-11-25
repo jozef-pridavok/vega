@@ -1,0 +1,45 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### List all client's reservations
+
+GET {{proto}}://{{host}}/v1/reservation/client/client1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Get current reservations
+
+GET {{proto}}://{{host}}/v1/reservation/current
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Get slot's dates
+
+GET {{proto}}://{{host}}/v1/reservation/slot/91ffacc8-516d-40e1-b542-630f7fa2d745/202403
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Confirm reservation
+
+PATCH {{proto}}://{{host}}/v1/reservation/91ffacc8-516d-40e1-b542-630f7fa2d745
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+{
+    "confirm": true
+}
+
+# eof

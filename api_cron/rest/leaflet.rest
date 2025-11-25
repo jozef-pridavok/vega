@@ -1,0 +1,192 @@
+
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+###
+
+GET http://vega-dev-capi.brokenmatrix.intra/ping    
+
+### QA Post new leaflet
+
+POST http://vega-dev-capi.brokenmatrix.intra/v1/leaflet?cardId=card2
+Content-Type: application/json
+X-API-Key: {{key}}
+
+{
+  "region": "sk",
+  "leaflets": [ 
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyer22311420232023032220230411sk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/0cc834daad696d56e2971b9cffe9c111.jpg"
+      ],
+      "title": "Flyer 22.3. - 11.4.2023",
+      "valid_to": "20230411",
+      "thumbnail": "https://public.vega.com/flyers/0cc834daad696d56e2971b9cffe9c111.jpg",
+      "valid_from": "20230322",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyer22311420232023032220230411sk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/cea674ed18d76844229eebe6ecedaf86.jpg"
+      ],
+      "title": "Flyer 22.3. - 11.4.2023",
+      "valid_to": "20230411",
+      "thumbnail": "https://public.vega.com/flyers/cea674ed18d76844229eebe6ecedaf86.jpg",
+      "valid_from": "20230322",
+      "description": ""
+    }
+  ]
+}
+
+### Post new leaflet
+
+POST {{proto}}://{{host}}/v1/leaflet?cardId=qfRfCLHjAg HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+
+{
+  "region": "sk",
+  "leaflets": [ 
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyer22311420232023032220230411sk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/0cc834daad696d56e2971b9cffe9c111.jpg"
+      ],
+      "title": "Flyer 22.3. - 11.4.2023",
+      "valid_to": "20230411",
+      "thumbnail": "https://public.vega.com/flyers/0cc834daad696d56e2971b9cffe9c111.jpg",
+      "valid_from": "20230322",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyer22311420232023032220230411sk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/cea674ed18d76844229eebe6ecedaf86.jpg"
+      ],
+      "title": "Flyer 22.3. - 11.4.2023",
+      "valid_to": "20230411",
+      "thumbnail": "https://public.vega.com/flyers/cea674ed18d76844229eebe6ecedaf86.jpg",
+      "valid_from": "20230322",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyer22311420232023032220230411sk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/cddb941f3b27d082872b386a5ab631a2.jpg"
+      ],
+      "title": "Flyer 22.3. - 11.4.2023",
+      "valid_to": "20230411",
+      "thumbnail": "https://public.vega.com/flyers/cddb941f3b27d082872b386a5ab631a2.jpg",
+      "valid_from": "20230322",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/1014dd15788e0a8a1ad7966a2188f03e.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/1014dd15788e0a8a1ad7966a2188f03e.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/90a101c33f3e9cbdaddf8613c1ba0f86.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/90a101c33f3e9cbdaddf8613c1ba0f86.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/511fba74500dead58ff2ddbd0c1856ac.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/511fba74500dead58ff2ddbd0c1856ac.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/110436a1f815a8d01d8a07e284ea2b1d.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/110436a1f815a8d01d8a07e284ea2b1d.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/4470c27d92474c3dea15c87ebcdcdb06.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/4470c27d92474c3dea15c87ebcdcdb06.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/f57ff5bbe2a445c4646ff74fb5b2c1c8.jpg"
+      ],
+      "title": "Flyer  ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/f57ff5bbe2a445c4646ff74fb5b2c1c8.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/57f6f944cdc50d9560738e0deb0fba99.jpg"
+      ],
+      "title": "Flyer ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/57f6f944cdc50d9560738e0deb0fba99.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/1145f122fcafe5a8ad3ecc747c51c803.jpg"
+      ],
+      "title": "Flyer ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/1145f122fcafe5a8ad3ecc747c51c803.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    },
+    {
+      "pdf": "https://public.vega.com/flyers/oriflameletakyFlyersk.pdf",
+      "pages": [
+        "https://public.vega.com/flyers/a6ddffa066f6fe30a3d8c417d4c0f8d4.jpg"
+      ],
+      "title": "Flyer ",
+      "valid_to": "undefined",
+      "thumbnail": "https://public.vega.com/flyers/a6ddffa066f6fe30a3d8c417d4c0f8d4.jpg",
+      "valid_from": "undefined",
+      "description": ""
+    }
+  ]
+}
+
+# eof

@@ -1,0 +1,48 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### logs
+
+GET {{proto}}://{{host}}/v1/dashboard/log?xfrom=1&max=3 HTTP/1.1
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### post random error
+
+POST {{proto}}://{{host}}/v1/dashboard/log/random HTTP/1.1
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### Latest
+
+GET {{proto}}://{{host}}/v1/dashboard HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### Latest
+
+POST {{proto}}://{{host}}/v1/dashboard/client_report
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbjEiLCJpaWQiOiJmMTkyNTg1ZC1iNDY0LTQ1YWUtODVlNS1hMDY4OThmOWViOWIiLCJpYXQiOjE3Mjk3Njg3NjAsImV4cCI6MTcyOTc3NTk2MH0.SqI0x7AZHIpj5gSKYkRn7gUtb0d66OJkaip1iOIXnjuSDiMmst52qIoob0P-dbSBX7bzxeEcaBze6RccTuhP8A
+X-API-Key: {{key}}
+
+{
+    "reports": [
+        {
+            "_type": "newUsers",
+            "from": 20240901,
+            "days": 10
+        }
+    ] 
+}
+
+# eof

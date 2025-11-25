@@ -1,0 +1,147 @@
+default_platform(:android)
+
+platform :android do
+
+  ###############################################################################
+  ###
+  ### Dev
+  ###
+
+  lane :build_dev do
+    version_number = "1.0"
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version_number
+    puts "Build number: " + build_number
+    Dir.chdir "../.." do
+      sh("flutter", "build", "appbundle", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version_number,
+        "--build-number", build_number,
+        "--flavor", "dev", "./lib/main_dev.dart"
+      )
+      sh("flutter", "build", "apk", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version_number,
+        "--build-number", build_number,
+        "--flavor", "dev", "./lib/main_dev.dart"
+      )
+    end
+  end
+
+  lane :deploy_dev_google do
+    upload_to_play_store(
+      track: "internal", 
+      release_status: "draft", 
+      aab: "../../output/vega_dashboard-dev.aab"
+    )
+  end
+
+  ###############################################################################
+  ###
+  ### Qa
+  ###
+
+  lane :build_qa do
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir "../.." do
+      sh("flutter", "build", "appbundle", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "qa", "./lib/main_qa.dart"
+      )
+      sh("flutter", "build", "apk", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "qa", "./lib/main_qa.dart"
+      )
+    end
+  end
+
+  lane :deploy_qa_google do
+    upload_to_play_store(
+      track: "internal", 
+      release_status: "draft", 
+      aab: "../../output/vega_dashboard-qa.aab"
+    )
+  end
+
+  ###############################################################################
+  ###
+  ### Demo
+  ###
+
+  lane :build_demo do
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir "../.." do
+      sh("flutter",  "build", "appbundle", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "demo", "./lib/main_demo.dart"
+      )
+      sh("flutter",  "build", "apk", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "demo", "./lib/main_demo.dart"
+      )
+    end
+  end
+
+  lane :deploy_demo_google do
+    upload_to_play_store(
+      track: "internal", 
+      release_status: "draft", 
+      aab: "../../output/vega_dashboard-demo.aab"
+    )
+  end
+
+  ###############################################################################
+  ###
+  ### Prod
+  ###
+
+  lane :build_prod do
+    tag = last_git_tag.split('_')
+    version = tag[1]
+    build_number = ENV['CI_PIPELINE_ID']
+    puts "Version: " + version
+    puts "Build number: " + build_number
+    puts "Version date: " + tag[2]
+    Dir.chdir "../.." do
+      sh("flutter", "build", "appbundle", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "prod", "./lib/main_prod.dart"
+      )
+      sh("flutter", "build", "apk", "--release", 
+        "--obfuscate", "--split-debug-info", "./build/debug_info", 
+        "--build-name", version,
+        "--build-number", build_number,
+        "--flavor", "prod", "./lib/main_prod.dart"
+      )
+    end
+  end
+
+  lane :deploy_prod_google do
+    upload_to_play_store(
+      track: "internal", 
+      release_status: "draft", 
+      aab: "../../output/vega_dashboard-prod.aab"
+    )
+  end
+
+end

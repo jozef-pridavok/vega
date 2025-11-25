@@ -1,0 +1,29 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### Ping
+
+GET http://192.168.1.5:8080/ping
+
+### List of locations for client
+
+GET {{proto}}://{{host}}/v1/client_location/client1?noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Detail of the location
+
+GET {{proto}}://{{host}}/v1/location/loc1?noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+# eof

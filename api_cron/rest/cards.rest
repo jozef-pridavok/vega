@@ -1,0 +1,42 @@
+
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Ping Dev
+
+GET http://vega-dev-capi.brokenmatrix.intra/ping HTTP/1.1
+
+### Ping QA
+
+GET http://vega-qa-capi.brokenmatrix.intra/ping HTTP/1.1
+
+### DEV Get cards
+
+GET http://vega-dev-capi.brokenmatrix.intra/v1/cards?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: efbb9d21-02bf-466b-b4fa-6b70e79d48e8
+
+### QA Get cards
+
+GET http://vega-qa-capi.brokenmatrix.intra/v1/cards?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: f136e06a-563f-42e8-a8df-e756ba7fe863
+
+### Get cards
+
+GET {{proto}}://{{host}}/v1/cards?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+
+### Get cards by country
+
+GET {{proto}}://{{host}}/v1/cards?country=cz&noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+
+# eof

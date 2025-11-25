@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "API Cron",
+            "request": "launch",
+            "type": "dart",
+            "program": "bin/main.dart",
+            "args": [],
+            "toolArgs": [
+                "--define=APN_TEAM_ID=**********",
+                "--define=APN_KEY_ID=**********",
+                "--define=APN_PRIVATE_KEY=apn_api_key.p8",
+            ]
+        }
+    ]
+}

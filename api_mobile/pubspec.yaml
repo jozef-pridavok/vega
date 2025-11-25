@@ -1,0 +1,50 @@
+name: api_mobile
+description: A server app using the shelf package and Docker.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependency_overrides:
+  intl: any
+
+dependencies:
+  core_dart:
+    path: ../core_dart
+    #git:
+    #  url: "git@gitlab.vega.com:vega/core_dart.git"
+    #  ref: "refs/tags/241105.002"
+
+  intl: ^0.19.0
+  collection: ^1.19.0
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  shelf_static: ^1.1.2
+  riverpod: ^2.1.1
+  postgres: ^3.2.1
+
+  yaml: ^3.1.0 # TODO: remove when new architecture is implemented
+  dio: 5.2.1
+
+  http_parser: ^4.0.0 # dio!!!
+  mime: ^1.0.4
+  compute: ^1.0.2
+  bcrypt: ^1.1.3
+
+  stripe: ^4.11.0
+  dart_jsonwebtoken: ^2.10.0
+  image: ^4.1.3
+
+dev_dependencies:
+  #http: ^1.0.0 - Because api_mobile depends on stripe ^4.11.0 which depends on http ^0.13.1, http ^0.13.1 is required.
+  lints: ^4.0.0
+  test: ^1.25.7
+
+vega:
+  localization:
+    locales:
+      - sk
+      - en
+      - es
+    assets: langs/

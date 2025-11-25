@@ -1,0 +1,8 @@
+{
+    "html_notify_reservation_title": "Reservation reminder",
+    "html_notify_reservation_message": "Your reservation is approaching...",
+    "html_notify_reservation_slot_name": "Service: {service}",
+    "html_notify_reservation_date_time": "Date and time: {term}",
+    "html_notify_reservation_location": "Location: {location}",
+    "html_notify_reservation_price": "Price: {price}"
+}

@@ -1,0 +1,48 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### Detail of coupon
+
+GET  {{proto}}://{{host}}/v1/coupon/39a6ed42-c603-4aa4-a9a6-19a95063fee8
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### List of newest coupons for promo screen
+
+GET {{proto}}://{{host}}/v1/coupon/newest?country=sk&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### List of nearest coupons for promo screen
+
+GET {{proto}}://{{host}}/v1/coupon/newest?country=sk&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Nearest
+
+GET {{proto}}://{{host}}/v1/coupon/nearest?lat=48.75623147115407&lon=19.157422305266643&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Take coupon
+
+POST {{proto}}://{{host}}/v1/coupon/take/71ff5db8-757f-4b9f-af2e-98309b993362
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+# eof

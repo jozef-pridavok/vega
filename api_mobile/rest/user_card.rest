@@ -1,0 +1,65 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### List
+
+GET {{proto}}://{{host}}/v1/user/card?xcache HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### Detail
+
+GET {{proto}}://{{host}}/v1/user/card/detail/c1fdd2f5-bd8d-4b99-84f9-ef96ff83485f?noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: e2fbb166-d48f-4bb9-b197-18a7d2123c89
+Xx-Session: session1
+
+### Create card
+
+POST {{proto}}://{{host}}/v1/user/card/restcard1 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "name": "Rest API",
+  "description": "Created by REST API",
+  "codeType": 7
+}
+
+### Update card
+
+PUT {{proto}}://{{host}}/v1/user/card/restcard1 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "notes": "Note by REST API"
+}
+
+### Create card by receipt
+
+# PY: 5b434343160d1e4d485c17034644551846045917550e4703134b175b5f0b42460e4c54461c46450c0b6154105e5e0d0c0f1c0106132849040250091d53030e08095306035b01050505070701510106521f055250011d00060d501f0f0351061b570a0f0d1601775627555c71760a0401560702501e045006011d070207051e090159041950030b0b030402035108065400030407435363174e6507010f1504070755180b0a4755790c467f4a51097e430705070c050e01014b0701521d075252020b50625a15646f735c001452030b16035c0607520a030415547e47005a425f1f0344265b4a514541374c5547040c1a5106090c51515504550f03010100030652030751140351545319560104571b0e0a55521a5b070e0f06520407040d070005030506550406511f045057001b07000c52180d075403190106010e515207055b0c0400020453152c5372316e0a5252021c12557d005e5163330c195751010d0554570b515e540651550652570700531a0101505648500606051b085659551954575c0154035407520b540c5201520751045203490f52070a1b55
+# SK: 57525546020d1e4d5f5201075b5d4009460a68525312507e080f090a035104150b5c08071547455a06520c5314195b5b
+# SK: (O-221DF8D7344847E59DF8D73448A7E555) 7c1a05015473775a69005156061500017054147d7459751a50060c0071527406570d
+
+POST {{proto}}://{{host}}/v1/user/card/receipt/7c1a05015473775a69005156061500017054147d7459751a50060c0071527406570d HTTP/1.1
+Content-Type: text/plain
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "name": "Rest API",
+  "description": "Created by REST API",
+  "codeType": 7
+}
+
+# eof 

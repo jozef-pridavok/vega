@@ -1,0 +1,41 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### Ping
+
+GET http://192.168.1.5:8080/ping
+
+### List of clients by country
+
+GET {{proto}}://{{host}}/v1/client?country=sk&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### List of blocked clients
+
+GET {{proto}}://{{host}}/v1/client?blocked=true&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### Search clients by name
+
+GET {{proto}}://{{host}}/v1/client?like=%C%&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### Client detail
+
+GET {{proto}}://{{host}}/v1/client/detail/client1?&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+# eof

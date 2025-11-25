@@ -1,0 +1,47 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### List eligible client payments for seller
+
+GET {{proto}}://{{host}}/v1/dashboard/seller/payment/eligible
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: seller1
+X-Dev-Installation-Id: seller1installation
+
+### List seller payments in period
+
+GET {{proto}}://{{host}}/v1/dashboard/seller/payment?dateFrom=20231001&dateTo=20231031
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: seller1
+X-Dev-Installation-Id: seller1installation
+
+### List upaid seller payments 
+
+GET {{proto}}://{{host}}/v1/dashboard/seller/payment?onlyUnpaid=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: seller1
+X-Dev-Installation-Id: seller1installation
+
+### Request seller payment
+
+POST {{proto}}://{{host}}/v1/dashboard/seller/payment/request
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: seller1
+X-Dev-Installation-Id: seller1installation
+
+{
+    "payments": ["a1ad385e-9a24-4513-ac88-471b639396b9", "xxx"],
+    "invoiceNumber": "2023120301",
+    "dueDate": 20231231
+}
+
+### eof

@@ -1,0 +1,5 @@
+include:
+  - local: "cicd/*.yml"
+
+stages:
+  - test

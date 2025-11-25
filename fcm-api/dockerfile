@@ -1,0 +1,26 @@
+FROM node:18-alpine as npm-stage
+WORKDIR /tmp
+RUN apk update
+RUN apk --no-cache add git tzdata
+ARG DEPLOY_USER_TOKEN
+ENV TZ=Europe/Bratislava
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN git config --global url."https://${DEPLOY_USER_TOKEN}@gitlab.vega.com/".insteadOf git@gitlab.vega.com:
+COPY package*.json ./
+RUN npm ci
+
+FROM npm-stage as build-stage
+WORKDIR /tmp
+ARG FLAVOR
+COPY ./ ./
+RUN npm run build-docker
+COPY .env ./dist/.env
+COPY fcm_app_key_$FLAVOR.json ./dist/
+
+FROM npm-stage as deploy-stage
+WORKDIR /app
+COPY --from=build-stage /tmp/dist/ ./
+RUN mv /tmp/node_modules /tmp/package*.json ./
+EXPOSE 8000
+ENV NODE_ENV=production
+CMD ["node", "./index.js"]

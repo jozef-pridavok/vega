@@ -1,0 +1,156 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dev Debug (remote API)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Dev Debug (local API)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "dev"
+            ],
+            "toolArgs": [
+                "--dart-define",
+                "API=http://192.168.0.68:8080",
+            ]
+        },
+        {
+            "name": "Dev Release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": [
+                "--release",
+                "--flavor",
+                "dev"
+            ]
+        },
+        {
+            "name": "Qa Debug",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_qa.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "qa"
+            ]
+        },
+        {
+            "name": "Qa Debug (local API)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_qa.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "qa"
+            ],
+            "toolArgs": [
+                "--dart-define",
+                "API=http://192.168.0.68:8080",
+            ]
+        },
+        {
+            "name": "Qa Profile",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_qa.dart",
+            "args": [
+                "--profile",
+                "--flavor",
+                "qa"
+            ]
+        },
+        {
+            "name": "Qa Release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_qa.dart",
+            "args": [
+                "--release",
+                "--flavor",
+                "qa"
+            ]
+        },
+        {
+            "name": "Demo Debug",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_demo.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "demo"
+            ]
+        },
+        {
+            "name": "Demo Profile",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_demo.dart",
+            "args": [
+                "--profile",
+                "--flavor",
+                "demo"
+            ]
+        },
+        {
+            "name": "Demo Release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_demo.dart",
+            "args": [
+                "--release",
+                "--flavor",
+                "demo"
+            ]
+        },
+        {
+            "name": "Prod Debug",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_prod.dart",
+            "args": [
+                "--debug",
+                "--flavor",
+                "prod"
+            ]
+        },
+        {
+            "name": "Prod Profile",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_prod.dart",
+            "args": [
+                "--profile",
+                "--flavor",
+                "prod"
+            ]
+        },
+        {
+            "name": "Prod Release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_prod.dart",
+            "args": [
+                "--release",
+                "--flavor",
+                "prod"
+            ]
+        }
+    ]
+}

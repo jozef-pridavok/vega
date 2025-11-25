@@ -1,0 +1,41 @@
+stages:
+  - test
+
+default:
+  image: ghcr.io/cirruslabs/flutter:3.19.5
+
+code_quality:
+  stage: test
+  before_script:
+    - git config --global url."https://${DEPLOY_USER_TOKEN}@gitlab.vega.com/".insteadOf "git@gitlab.vega.com:"
+    - flutter pub global activate dart_code_metrics
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+  script:
+    - metrics lib -r codeclimate  > gl-code-quality-report.json
+  artifacts:
+    expire_in: 1 week
+    reports:
+      codequality: gl-code-quality-report.json
+  tags:
+    - shared-builder-docker-1
+
+test:
+  stage: test
+  before_script:
+    - git config --global url."https://${DEPLOY_USER_TOKEN}@gitlab.vega.com/".insteadOf "git@gitlab.vega.com:"
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+    - flutter pub global activate junitreport
+  script:
+    - flutter test --machine --coverage | tojunit -o report.xml
+    #- lcov --summary coverage/lcov.info
+    #- genhtml coverage/lcov.info --output=coverage
+  #coverage: '/lines\.*: \d+\.\d+\%/'
+  artifacts:
+    expire_in: 1 week
+    name: coverage
+    paths:
+      - $CI_PROJECT_DIR/coverage
+    reports:
+      junit: report.xml
+  tags:
+    - shared-builder-docker-1

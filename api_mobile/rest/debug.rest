@@ -1,0 +1,39 @@
+@proto = {{$dotenv PROTO}}
+@host = {{$dotenv HOST}}
+@key = {{$dotenv API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+
+# http://localhost:8080/v1/debug/template
+### Template
+
+GET {{proto}}://{{host}}/v1/debug/template
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+### Redis: Get String
+
+GET {{proto}}://{{host}}/v1/debug/redis/get_string HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+### Redis: Get Bulk String
+
+GET {{proto}}://{{host}}/v1/debug/redis/get_bulk_string HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+###
+

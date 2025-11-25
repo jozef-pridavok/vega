@@ -1,0 +1,8 @@
+{
+    "html_notify_reservation_title": "Pripomenutie rezervácie",
+    "html_notify_reservation_message": "Vaša rezervácia sa blíži...",
+    "html_notify_reservation_slot_name": "Služba: {service}",
+    "html_notify_reservation_date_time": "Dátum a čas: {term}",
+    "html_notify_reservation_location": "Miesto: {location}",
+    "html_notify_reservation_price": "Cena: {price}"
+}

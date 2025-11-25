@@ -1,0 +1,185 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Ping
+
+GET http://192.168.68.108:8080/ping HTTP/1.1
+
+### Start
+
+POST {{proto}}://{{host}}/v1/user/anonymous HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+
+{
+    "installationId": "installation1",
+    "deviceToken":  "deviceToken1",
+    "deviceInfo": {
+        "name": "iPhone 6",
+        "os": "iOS",
+        "osVersion": "9.3.2",
+        "model": "iPhone 6",
+        "manufacturer": "Apple",
+        "screenWidth": 375,
+        "screenHeight": 667,
+        "screenDensity": 2,
+        "screenDpi": 326,
+        "screenOrientation": "portrait",
+        "screenSize": 4.7,
+        "screenFormat": "16:9",
+        "screenResolution": "750x1334",
+        "screenDensityDpi": 326,
+        "screenDensityBucket": "xhdpi",
+        "screenDensityBucketRaw": "xhdpi",
+        "screenDensityBucketNumeric": 3,
+        "screenDensityBucketNumericRaw": 3,
+        "screenDensityBucketNumericDp": 3
+    },
+    "locale": "en"
+}
+
+### Startup
+
+POST {{proto}}://{{host}}/v1/user/startup
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "deviceToken": "deviceTokenUpdatedbyRestApi"
+}
+
+### Get user detail
+
+GET {{proto}}://{{host}}/v1/user?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### Save user detail
+
+PUT {{proto}}://{{host}}/v1/user?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+    "yob": 1977,
+    "folders": {
+      "list": [
+        {
+          "name": "All",
+          "type": 1,
+          "layout": 3,
+          "folderId": "all",
+          "userCards": []
+        },
+        {
+          "name": "Favorites",
+          "type": 2,
+          "layout": 3,
+          "folderId": "favorites",
+          "userCards": []
+        },
+        {
+          "name": "Trash",
+          "type": 3,
+          "layout": 3,
+          "folderId": "trash",
+          "userCards": []
+        }
+      ],
+      "selected": "all"
+    }    
+}
+
+### Signin
+
+POST {{proto}}://{{host}}/v1/user/signin HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: a30ba59a-4f0e-4311-b8ba-5e783b5c3b91
+
+{
+    "email": "oxy@oxy.com",
+    "password": "123"
+}
+
+### Signup
+
+POST {{proto}}://{{host}}/v1/user/signup HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: a30ba59a-4f0e-4311-b8ba-5e783b5c3b91
+
+{
+    "installationId": "installation1",
+    "email": "oxy@oxy.com",
+    "password": "123"
+}
+
+### Logout
+
+POST {{proto}}://{{host}}/v1/user/logout HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: b167914f-2614-4069-8952-15a032dc41a8
+
+### List of user addresses
+
+GET {{proto}}://{{host}}/v1/user/address
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### Add user address
+
+POST {{proto}}://{{host}}/v1/user/address HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+{
+    "name": "Home",
+    "address": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip": "94105",
+    "country": "USA"
+}
+
+### Update user address
+
+PUT {{proto}}://{{host}}/v1/user/address HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+{
+    "userAddressId": "1a6ff4d0-0817-4cb6-adda-9d308291efb3",
+    "name": "Práca",
+    "address": "Pod mostom 1",
+    "zip": "97411",
+    "country": "SK"
+}
+
+
+### Delete user address
+
+
+DELETE {{proto}}://{{host}}/v1/user/address/51c18b98-6771-4a11-ad58-8b9592f2830c HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+# eof

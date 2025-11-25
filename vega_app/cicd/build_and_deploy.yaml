@@ -1,0 +1,451 @@
+stages:
+  - init
+  - build
+  - deploy
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+# .ruby:
+#   stage: .pre
+#   tags:
+#     - ios
+#     - android
+#   before_script:
+#     - |
+#       if [[ "$CI_RUNNER_TAGS" != *"ios"* ]]; then
+#         eval "$(rbenv init -)"
+#       fi
+#     - rbenv shell 3.3.0
+
+.ruby-ios:
+  stage: .pre
+  tags:
+    - ios
+  before_script:
+    - rbenv shell 3.3.0
+
+.ruby-android:
+  stage: .pre
+  tags:
+    - android
+  before_script:
+    - eval "$(rbenv init -)"
+    - rbenv shell 3.3.0
+
+init-ios:
+  stage: .pre
+  variables:
+    GIT_STRATEGY: clone
+  tags:
+    - ios
+  extends: .ruby-ios
+  script:
+    - pwd
+    - ruby --version
+    - mkdir -p ../output
+    - flutter pub get
+    - cd ios
+    - gem install --user-install bundler
+    - bundle install --path vendor/bundle
+    - gem install cocoapods
+    - cat $ASC_KEY > ./api_key.p8
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    #- devel
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+init-android:
+  stage: .pre
+  variables:
+    GIT_STRATEGY: clone
+  tags:
+    - android
+  extends: .ruby-android
+  script:
+    - pwd
+    - ruby --version
+    - mkdir -p ../output
+    - flutter pub get
+    - cd android
+    - gem install --user-install bundler
+    - bundle install --path vendor/bundle
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_google$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+.update-google-service-json: &update-google-service-json
+  - echo "Updating google-service.json for $CI_ENVIRONMENT_NAME environment"
+  - |
+    if [ "$CI_ENVIRONMENT_NAME" == "dev" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_DEV
+    elif [ "$CI_ENVIRONMENT_NAME" == "qa" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_QA
+    elif [ "$CI_ENVIRONMENT_NAME" == "demo" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_DEMO
+    elif [ "$CI_ENVIRONMENT_NAME" == "prod" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_PROD
+    else
+      echo "Unknown environment: $CI_ENVIRONMENT_NAME"
+      exit 1
+    fi
+  - cat $CONFIG_FILE > ./app/google-services.json
+
+###############################################################################
+###
+### Dev
+###
+
+b-ios-dev:
+  stage: build
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-dev.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.app.dev CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_dev"
+    - APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane build_dev
+    - cp ./Runner.ipa ../../output/vega_app-dev.ipa
+  tags:
+    - ios
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-dev:
+  stage: deploy
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["b-ios-dev"]
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane deploy_dev_apple
+  tags:
+    - ios
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-dev:
+  stage: build
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["init-android"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-dev.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.app.dev CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_dev"
+    - APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane build_dev
+    - cp ../build/app/outputs/bundle/devRelease/app-dev-release.aab ../../output/vega_app-dev.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-dev-release.apk /data/static-dev/vega_app-dev.apk
+        echo $CI_PIPELINE_ID > /data/static-dev/vega_app-dev.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-dev:
+  stage: deploy
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["b-android-dev"]
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.app.dev" bundle exec fastlane deploy_dev_google
+  tags:
+    - android
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+###############################################################################
+###
+### Qa
+###
+
+b-ios-qa:
+  stage: build
+  environment:
+    name: qa
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-qa.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.app.qa CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_qa"
+    - APP_IDENTIFIER="com.vega.app.qa" bundle exec fastlane build_qa
+    - cp ./Runner.ipa ../../output/vega_app-qa.ipa
+  tags:
+    - ios
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-qa:
+  stage: deploy
+  environment:
+    name: qa
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["b-ios-qa"]
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.app.qa" bundle exec fastlane deploy_qa_apple
+  tags:
+    - ios
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-qa:
+  stage: build
+  environment:
+    name: qa
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["init-android"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-qa.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.app.qa CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_qa"
+    - APP_IDENTIFIER="com.vega.app.qa" bundle exec fastlane build_qa
+    - cp ../build/app/outputs/bundle/qaRelease/app-qa-release.aab ../../output/vega_app-qa.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-qa-release.apk /data/static-qa/vega_app-qa.apk
+        echo $CI_PIPELINE_ID > /data/static-qa/vega_app-qa.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_google$/
+
+d-google-qa:
+  stage: deploy
+  environment:
+    name: qa
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["b-android-qa"]
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.app.qa" bundle exec fastlane deploy_qa_google
+  tags:
+    - android
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_google$/
+
+###############################################################################
+###
+### Demo
+###
+
+b-ios-demo:
+  stage: build
+  environment:
+    name: demo
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-demo.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.app.demo CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_demo"
+    - APP_IDENTIFIER="com.vega.app.demo" bundle exec fastlane build_demo
+    - cp ./Runner.ipa ../../output/vega_app-demo.ipa
+  tags:
+    - ios
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-demo:
+  stage: deploy
+  environment:
+    name: demo
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["b-ios-demo"]
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.app.demo" bundle exec fastlane deploy_demo_apple
+  tags:
+    - ios
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-demo:
+  stage: build
+  environment:
+    name: demo
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["init-android"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-demo.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.app.demo CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_demo"
+    - APP_IDENTIFIER="com.vega.app.demo" bundle exec fastlane build_demo
+    - cp ../build/app/outputs/bundle/demoRelease/app-demo-release.aab ../../output/vega_app-demo.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-demo-release.apk /data/static-demo/vega_app-demo.apk
+        echo $CI_PIPELINE_ID > /data/static-demo/vega_app-demo.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-demo:
+  stage: deploy
+  environment:
+    name: demo
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["b-android-demo"]
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.app.demo" bundle exec fastlane deploy_demo_google
+  tags:
+    - android
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+###############################################################################
+###
+### Prod
+###
+
+b-ios-prod:
+  stage: build
+  environment:
+    name: prod
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_app-prod.ipa
+    - cat $ENV_PROD > ./lib/environment_prod.dart
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.app CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_prod"
+    - APP_IDENTIFIER="com.vega.app" bundle exec fastlane build_prod
+    - cp ./Runner.ipa ../../output/vega_app-prod.ipa
+  tags:
+    - ios
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-prod:
+  stage: deploy
+  environment:
+    name: prod
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["b-ios-prod"]
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.app" bundle exec fastlane deploy_prod_apple
+  tags:
+    - ios
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-prod:
+  stage: build
+  environment:
+    name: prod
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["init-android"]
+  script:
+    - pwd
+    - cat $ENV_PROD > ./lib/environment_prod.dart
+    - rm -fv ../output/vega_app-prod.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.app CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_prod"
+    - APP_IDENTIFIER="com.vega.app" bundle exec fastlane build_prod
+    - cp ../build/app/outputs/bundle/prodRelease/app-prod-release.aab ../../output/vega_app-prod.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-prod-release.apk /data/static-prod/vega_app-prod.apk
+        echo $CI_PIPELINE_ID > /data/static-prod/vega_app-prod.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-prod:
+  stage: deploy
+  environment:
+    name: prod
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["b-android-prod"]
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.app" bundle exec fastlane deploy_prod_google
+  tags:
+    - android
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+# eof

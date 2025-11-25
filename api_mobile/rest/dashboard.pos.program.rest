@@ -1,0 +1,25 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### List all programs
+
+GET {{proto}}://{{host}}/v1/program/?client=client1 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+
+### Detail of the program
+
+GET {{proto}}://{{host}}/v1/program/detail/program1?noCache=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+
+# eof

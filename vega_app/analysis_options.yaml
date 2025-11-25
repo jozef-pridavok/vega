@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    curly_braces_in_flow_control_structures: false
+    prefer_double_quotes: true
+    unawaited_futures: true
+#
+# https://dart.dev/guides/language/analysis-options
+#
+
+# oef

@@ -1,0 +1,4 @@
+#include "../../Flutter/Flutter-Debug.xcconfig"
+#include "Warnings.xcconfig"
+// https://github.com/flutter/flutter/issues/64088
+// FLUTTER_BUILD_MODE=debug

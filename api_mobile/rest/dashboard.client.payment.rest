@@ -1,0 +1,65 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### List of payment providers
+
+GET {{proto}}://{{host}}/v1/dashboard/payment-provider/
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### List client payments in period
+
+GET {{proto}}://{{host}}/v1/dashboard/client/payment?from=20230801&to=20231131
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+
+### List unpaid client payments 
+
+GET {{proto}}://{{host}}/v1/dashboard/client/payment?onlyUnpaid=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### Start Stripe payment
+
+POST {{proto}}://{{host}}/v1/dashboard/stripe/start/bmts
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+{
+    "payments": [
+        "2d22d9ba-add1-4e0f-b042-9f737b4e0444"
+    ],
+    "amount": 2550,
+    "currency": "EUR"
+}
+
+### Confirm payment
+
+PUT {{proto}}://{{host}}/v1/dashboard/client/payment/confirm
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+{
+    "providerId": "bmts",
+    "payments": [
+        "2d22d9ba-add1-4e0f-b042-9f737b4e0444"
+    ],
+    "payload": {}
+}
+### eof

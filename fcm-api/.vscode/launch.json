@@ -1,0 +1,26 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug ts-node-dev",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "node",
+			"runtimeArgs": ["--nolazy", "-r", "ts-node/register", "--trace-warnings"],
+			"args": ["src/index.ts"],
+			"cwd": "${workspaceRoot}",
+            //"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"skipFiles": ["<node_internals>/**", "node_modules/**"],
+            "outputCapture": "std",
+            //"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "env": {
+                "NODE_PATH": "./src",
+                "NODE_OPTIONS": "--loader ts-node/esm"
+            }
+		}
+	]
+}

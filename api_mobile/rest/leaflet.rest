@@ -1,0 +1,26 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### List current active leaflets of client
+
+GET {{proto}}://{{host}}/v1/leaflet/client1 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+### List of clients with the count of current active leaflets
+
+GET {{proto}}://{{host}}/v1/leaflet/client?noCache=true&country=sk&limit=10 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: user1
+X-Dev-Installation-Id: installation1
+
+
+#

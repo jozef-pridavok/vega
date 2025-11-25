@@ -1,0 +1,178 @@
+name: vega_app
+description: A new Flutter project.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependency_overrides:
+  intl: any
+  collection: any
+
+  #url_launcher_ios: 6.3.1
+  #win32: ^5.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  core_flutter:
+    path: ../core_flutter
+    #git:
+    #  url: git@gitlab.vega.com:vega/core_flutter.git
+    #  ref: "refs/tags/241026.001"
+
+  intl: ^0.19.0
+  collection: ^1.17.1
+
+  flutter_riverpod: ^2.5.1
+  hive: ^2.2.3
+
+  focus_detector: ^2.0.1
+
+  #permission_handler: ^11.3.0
+  geolocator: ^13.0.1
+
+  reorderable_grid: ^1.0.10
+  smooth_page_indicator: ^1.1.0
+
+  rounded_background_text: ^0.5.0
+  easy_rich_text: ^2.2.0
+
+  rate_my_app: ^2.2.0
+
+  #firebase_core: 3.1.0
+  #firebase_messaging: 15.0.1
+  push: ^2.3.0
+
+  uni_links: ^0.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+  flutter_flavorizr: ^2.2.2
+
+flavorizr:
+  app:
+    android:
+      flavorDimensions: "flavor-type"
+  flavors:
+    dev:
+      app:
+        name: "Dev"
+      android:
+        applicationId: "com.vega.app.dev"
+      ios:
+        bundleId: "com.vega.app.dev"
+      macos:
+        bundleId: "com.vega.app.dev"
+    qa:
+      app:
+        name: "Qa"
+      android:
+        applicationId: "com.vega.app.qa"
+      ios:
+        bundleId: "com.vega.app.qa"
+      macos:
+        bundleId: "com.vega.app.qa"
+    demo:
+      app:
+        name: "Demo"
+      android:
+        applicationId: "com.vega.app.demo"
+      ios:
+        bundleId: "com.vega.app.demo"
+      macos:
+        bundleId: "com.vega.app.demo"
+    prod:
+      app:
+        name: "Vega"
+      android:
+        applicationId: "com.vega.app"
+      ios:
+        bundleId: "com.vega.app"
+      macos:
+        bundleId: "com.vega.app"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/icons/
+    - assets/images/
+    - assets/langs/
+    - assets/html/
+    - assets/html/en/
+    - assets/html/sk/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Black.ttf
+          weight: 900
+          style: normal
+        - asset: assets/fonts/Poppins-BlackItalic.ttf
+          weight: 900
+          style: italic
+        - asset: assets/fonts/Poppins-ExtraBold.ttf
+          weight: 800
+          style: normal
+        - asset: assets/fonts/Poppins-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+          style: normal
+        - asset: assets/fonts/Poppins-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+          style: normal
+        - asset: assets/fonts/Poppins-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+          style: normal
+        - asset: assets/fonts/Poppins-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+          style: normal
+        - asset: assets/fonts/Poppins-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
+          style: normal
+        - asset: assets/fonts/Poppins-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Poppins-ExtraLight.ttf
+          weight: 200
+          style: normal
+        - asset: assets/fonts/Poppins-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/Poppins-Thin.ttf
+          weight: 100
+          style: normal
+        - asset: assets/fonts/Poppins-ThinItalic.ttf
+          weight: 100
+          style: italic
+
+vega:
+  localization:
+    locales:
+      - sk
+      - en
+      - es
+    assets: assets/langs/
+# eof

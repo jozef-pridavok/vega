@@ -1,0 +1,50 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+Content-Type: application/json
+
+### Add points
+
+POST {{proto}}://{{host}}/v1/dashboard/pos/transaction/add HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "number": "1234567890",
+  "userCardId": "uc11",
+  "programId": "program1",
+  "points": 50
+}
+
+### Spend points
+
+POST {{proto}}://{{host}}/v1/pos_transaction/spend HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "number": "1234567890",
+  "userCardId": "uc11",
+  "programId": "program1",
+  "points": 50
+}
+
+### Request reward
+
+POST {{proto}}://{{host}}/v1/pos_transaction/request_reward HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+  "number": "1234567890",
+  "programId": "program1",
+  "programRewardId": "reward2",
+  "points": 50
+}

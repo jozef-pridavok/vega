@@ -1,0 +1,16 @@
+
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping
+
+### Notify reservations
+
+GET {{proto}}://{{host}}/v1/user/notify_reservations/notify
+Content-Type: application/json
+X-API-Key: {{key}}
+
+# eof

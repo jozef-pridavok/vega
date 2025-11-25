@@ -1,0 +1,33 @@
+{
+    "dart.lineLength": 120,
+    "[dart]": {
+        "editor.rulers": [
+            120
+        ],
+    },
+    "cSpell.words": [
+        "cryptex",
+        "dotenv",
+        "Moleculus"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#289cff",
+        "activityBar.background": "#289cff",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#bf0067",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#289cff",
+        "statusBar.background": "#0084f4",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#289cff",
+        "statusBarItem.remoteBackground": "#0084f4",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#0084f4",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#0084f499",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#0084F4"
+}

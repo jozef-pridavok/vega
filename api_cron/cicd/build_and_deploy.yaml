@@ -1,0 +1,223 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+.update-config: &update-config
+  - echo "Updating config for $CI_ENVIRONMENT_NAME environment"
+  - |
+    if [ "$CI_ENVIRONMENT_NAME" == "dev" ]; then
+      CONFIG_FILE=$CONFIG_DEV_YAML
+    elif [ "$CI_ENVIRONMENT_NAME" == "qa" ]; then
+      CONFIG_FILE=$CONFIG_QA_YAML
+    elif [ "$CI_ENVIRONMENT_NAME" == "demo" ]; then
+      CONFIG_FILE=$CONFIG_DEMO_YAML
+    elif [ "$CI_ENVIRONMENT_NAME" == "prod" ]; then
+      CONFIG_FILE=$CONFIG_PROD_YAML
+    else
+      echo "Unknown environment: $CI_ENVIRONMENT_NAME"
+      exit 1
+    fi
+  - cat $CONFIG_FILE > config.yaml
+  - cat $APN_KEY > apn_api_key.p8
+  - >
+    sed -i "s/build: 1/build: $CI_PIPELINE_ID/g" config.yaml
+  - >
+    sed -i "s/key_id: APN_KEY_ID/key_id: $APN_KEY_ID/g" config.yaml
+  - >
+    sed -i "s/team_id: APN_TEAM_ID/team_id: $ASC_TEAM_ID/g" config.yaml
+  - >
+    sed -i "s/private_key: APN_PRIVATE_KEY/private_key: apn_api_key.p8/g" config.yaml
+
+################################################################################
+#
+# Dev
+#
+
+b-api-dev:
+  stage: build
+  image: docker:latest
+  environment:
+    name: dev
+  variables:
+    IMG_TAG: "dev"
+  script:
+    - *update-config
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg SSH_KNOWN_HOSTS=$SSH_KNOWN_HOSTS 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^dev_(\d{6})(.)$/
+
+d-api-dev:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: dev
+  variables:
+    IMG_TAG: "dev"
+    port: "8041"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^dev_(\d{6})(.)$/
+
+################################################################################
+#
+# Qa
+#
+
+b-api-qa:
+  stage: build
+  image: docker:latest
+  environment:
+    name: qa
+  variables:
+    IMG_TAG: "qa"
+  script:
+    - *update-config
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg SSH_KNOWN_HOSTS=$SSH_KNOWN_HOSTS 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^qa_(\d{6})(.)$/
+
+d-api-qa:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: qa
+  variables:
+    IMG_TAG: "qa"
+    port: "8042"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^qa_(\d{6})(.)$/
+
+################################################################################
+#
+# Demo
+#
+
+b-api-demo:
+  stage: build
+  image: docker:latest
+  environment:
+    name: demo
+  variables:
+    IMG_TAG: "demo"
+  script:
+    - *update-config
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg SSH_KNOWN_HOSTS=$SSH_KNOWN_HOSTS 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^demo_(\d{6})(.)$/
+
+d-api-demo:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: demo
+  variables:
+    IMG_TAG: "demo"
+    port: "8043"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^demo_(\d{6})(.)$/
+
+################################################################################
+#
+# Prod
+#
+
+b-api-prod:
+  stage: build
+  image: docker:latest
+  environment:
+    name: prod
+  variables:
+    IMG_TAG: "prod"
+  script:
+    - *update-config
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg SSH_KNOWN_HOSTS=$SSH_KNOWN_HOSTS 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-jupiter-docker-1
+  only:
+    - /^v_(\d{6})(.)$/
+
+d-api-prod:
+  stage: deploy
+  environment:
+    name: prod
+  when: manual
+  allow_failure: false
+  image: docker:latest
+  variables:
+    IMG_TAG: "prod"
+    port: "8044"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-pluto-docker-1
+  only:
+    - /^v_(\d{6})(.)$/

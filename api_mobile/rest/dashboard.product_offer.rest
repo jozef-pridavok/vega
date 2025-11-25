@@ -1,0 +1,43 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Ping
+
+GET http://192.168.1.5:8080/ping HTTP/1.1
+
+### List of active product_offers
+
+GET {{proto}}://{{host}}/v1/dashboard/product_offer?filter=1 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### List of archived product_offers
+
+GET {{proto}}://{{host}}/v1/dashboard/product_offer?filter=2 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: admin1session
+
+### Create product_offer (manual)
+
+POST {{proto}}://{{host}}/v1/dashboard/product_offer/b56e0a83-30c4-4412-ac17-96275efd0c9a HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+x-dev-user-id: {{$dotenv %DEV_USER_ID}}
+x-dev-installation-id: {{$dotenv %DEV_INSTALLATION_ID}}
+
+{
+  "clientId": "c1",
+  "type": 1,
+  "name": "Product Offer 1",
+  "description": "Product Offer 1 description",
+}
+
+# eof

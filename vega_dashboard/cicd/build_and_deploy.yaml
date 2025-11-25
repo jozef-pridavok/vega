@@ -1,0 +1,656 @@
+stages:
+  - init
+  - build
+  - deploy
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+.ruby-ios:
+  stage: .pre
+  tags:
+    - ios
+  before_script:
+    #- eval "$(rbenv init -)"
+    - rbenv shell 3.3.0
+
+.ruby-android:
+  stage: .pre
+  tags:
+    - android
+  before_script:
+    - |
+      if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        eval "$(rbenv init -)"
+      fi
+    - rbenv shell 3.3.0
+
+init-ios:
+  stage: .pre
+  variables:
+    GIT_STRATEGY: clone
+  tags:
+    - ios
+  extends: .ruby-ios
+  script:
+    - ruby --version
+    - pwd
+    - mkdir -p ../output
+    #
+    - flutter clean
+    - rm -rf ios/Pods ios/Podfile.lock
+    #
+    - flutter pub get
+    - cd ios
+    - gem install --user-install bundler
+    - bundle install --path vendor/bundle
+    - gem install cocoapods
+    - cat $ASC_KEY > ./api_key.p8
+    #- pod install
+    ##- sh /Users/oxy/builds/setup.sh
+    #- bundle config set --local path 'vendor/bundle'
+    #- bundle update
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_apple$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+init-android:
+  stage: .pre
+  variables:
+    GIT_STRATEGY: clone
+  tags:
+    - android
+  extends: .ruby-android
+  script:
+    - ruby --version
+    - pwd
+    - mkdir -p ../output
+    - flutter pub get
+    - cd android
+    - gem install --user-install bundler
+    - bundle install --path vendor/bundle
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_web$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)_google$/
+
+.update-google-service-json: &update-google-service-json
+  - echo "Updating google-service.json for $CI_ENVIRONMENT_NAME environment"
+  - |
+    if [ "$CI_ENVIRONMENT_NAME" == "dev" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_DEV
+    elif [ "$CI_ENVIRONMENT_NAME" == "qa" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_QA
+    elif [ "$CI_ENVIRONMENT_NAME" == "demo" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_DEMO
+    elif [ "$CI_ENVIRONMENT_NAME" == "prod" ]; then
+      CONFIG_FILE=$GOOGLE_SERVICE_JSON_PROD
+    else
+      echo "Unknown environment: $CI_ENVIRONMENT_NAME"
+      exit 1
+    fi
+  - cat $CONFIG_FILE > ./app/google-services.json
+
+###############################################################################
+###
+### Dev
+###
+
+b-ios-dev:
+  stage: build
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-dev.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.dashboard.dev CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_dev"
+    - APP_IDENTIFIER="com.vega.dashboard.dev" bundle exec fastlane build_dev
+    - cp ./Runner.ipa ../../output/vega_dashboard-dev.ipa
+  tags:
+    - ios
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-dev:
+  stage: deploy
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-ios
+  needs: ["b-ios-dev"]
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.dashboard.dev" bundle exec fastlane deploy_dev_apple
+  tags:
+    - ios
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-dev:
+  stage: build
+  environment:
+    name: dev
+  variables:
+    GIT_STRATEGY: none
+  extends: .ruby-android
+  needs: ["init-android"]
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-dev.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.dashboard.dev CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_dev"
+    - APP_IDENTIFIER="com.vega.dashboard.dev" bundle exec fastlane build_dev
+    - cp ../build/app/outputs/bundle/devRelease/app-dev-release.aab ../../output/vega_dashboard-dev.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-dev-release.apk /data/static-dev/vega_dashboard-dev.apk
+        echo $CI_PIPELINE_ID > /data/static-dev/vega_dashboard-dev.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-dev:
+  stage: deploy
+  environment:
+    name: dev
+  extends: .ruby-android
+  needs: ["b-android-dev"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.dashboard.dev" bundle exec fastlane deploy_dev_google
+  tags:
+    - android
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+
+b-web-dev:
+  stage: build
+  image: docker:latest
+  environment:
+    name: dev
+  variables:
+    FLUTTER_ARGS: "./lib/main_dev.dart"
+    FLAVOR: "dev"
+  script:
+    - echo "${CI_COMMIT_TAG:=dev_1.0_$(date +%y%m%d)a}"
+    - VERSION_NAME=$(echo "$CI_COMMIT_TAG" | sed -E 's/^.*_([0-9]+\.[0-9]+)_.*$/\1/')
+    - echo $VERSION_NAME
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg FLUTTER_ARGS=$FLUTTER_ARGS
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg VERSION_NAME=$VERSION_NAME 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - /^dev_(\d+).(\d+)_(\d{6})(.)_web$/
+
+d-web-dev:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: dev
+  variables:
+    FLAVOR: "dev"
+    PORT: "8051"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d -p $PORT:80
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - /^dev_(\d+).(\d+)_(\d{6})(.)_web$/
+
+###############################################################################
+###
+### Qa
+###
+
+b-ios-qa:
+  stage: build
+  environment:
+    name: qa
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-qa.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.dashboard.qa CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_qa"
+    - APP_IDENTIFIER="com.vega.dashboard.qa" bundle exec fastlane build_qa
+    - cp ./Runner.ipa ../../output/vega_dashboard-qa.ipa
+  tags:
+    - ios
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_apple$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_web$/
+
+d-apple-qa:
+  stage: deploy
+  environment:
+    name: qa
+  extends: .ruby-ios
+  needs: ["b-ios-qa"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.dashboard.qa" bundle exec fastlane deploy_qa_apple
+  tags:
+    - ios
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_apple$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_web$/
+
+b-android-qa:
+  stage: build
+  environment:
+    name: qa
+  extends: .ruby-android
+  needs: ["init-android"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-qa.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.dashboard.qa CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_qa"
+    - APP_IDENTIFIER="com.vega.dashboard.qa" bundle exec fastlane build_qa
+    - cp ../build/app/outputs/bundle/qaRelease/app-qa-release.aab ../../output/vega_dashboard-qa.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-qa-release.apk /data/static-qa/vega_dashboard-qa.apk
+        echo $CI_PIPELINE_ID > /data/static-qa/vega_dashboard-qa.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-qa:
+  stage: deploy
+  environment:
+    name: qa
+  extends: .ruby-android
+  needs: ["b-android-qa"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.dashboard.qa" bundle exec fastlane deploy_qa_google
+  tags:
+    - android
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+b-web-qa:
+  stage: build
+  image: docker:latest
+  environment:
+    name: qa
+  variables:
+    FLUTTER_ARGS: "./lib/main_qa.dart"
+    FLAVOR: "qa"
+  script:
+    - VERSION_NAME=$(echo "$CI_COMMIT_TAG" | sed -E 's/^.*_([0-9]+\.[0-9]+)_.*$/\1/')
+    - echo $VERSION_NAME
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg FLUTTER_ARGS=$FLUTTER_ARGS 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg VERSION_NAME=$VERSION_NAME 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_web$/
+
+d-web-qa:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: qa
+  needs: ["b-web-qa"]
+  variables:
+    FLAVOR: "qa"
+    PORT: "8052"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d -p $PORT:80
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+    - /^qa_(\d+).(\d+)_(\d{6})(.)_web$/
+
+###############################################################################
+###
+### Demo
+###
+
+b-ios-demo:
+  stage: build
+  environment:
+    name: demo
+  extends: .ruby-ios
+  needs: ["init-ios"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-demo.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.dashboard.demo CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_demo"
+    - APP_IDENTIFIER="com.vega.dashboard.demo" bundle exec fastlane build_demo
+    - cp ./Runner.ipa ../../output/vega_dashboard-demo.ipa
+  tags:
+    - ios
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-demo:
+  stage: deploy
+  environment:
+    name: demo
+  extends: .ruby-ios
+  needs: ["b-ios-demo"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.dashboard.demo" bundle exec fastlane deploy_demo_apple
+  tags:
+    - ios
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-demo:
+  stage: build
+  environment:
+    name: demo
+  extends: .ruby-android
+  needs: ["init-android"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - rm -fv ../output/vega_dashboard-demo.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.dashboard.demo CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_demo"
+    - APP_IDENTIFIER="com.vega.dashboard.demo" bundle exec fastlane build_demo
+    - cp ../build/app/outputs/bundle/demoRelease/app-demo-release.aab ../../output/vega_dashboard-demo.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-demo-release.apk /data/static-demo/vega_dashboard-demo.apk
+        echo $CI_PIPELINE_ID > /data/static-demo/vega_dashboard-demo.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-google-demo:
+  stage: deploy
+  environment:
+    name: demo
+  extends: .ruby-android
+  needs: ["b-android-demo"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.dashboard.demo" bundle exec fastlane deploy_demo_google
+  tags:
+    - android
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+b-web-demo:
+  stage: build
+  image: docker:latest
+  environment:
+    name: demo
+  variables:
+    FLUTTER_ARGS: "./lib/main_demo.dart"
+    FLAVOR: "demo"
+  script:
+    - VERSION_NAME=$(echo "$CI_COMMIT_TAG" | sed -E 's/^.*_([0-9]+\.[0-9]+)_.*$/\1/')
+    - echo $VERSION_NAME
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg FLUTTER_ARGS=$FLUTTER_ARGS 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg VERSION_NAME=$VERSION_NAME 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-web-demo:
+  stage: deploy
+  image: docker:latest
+  environment:
+    name: demo
+  needs: ["b-web-demo"]
+  variables:
+    FLAVOR: "demo"
+    PORT: "8053"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d -p $PORT:80
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+###############################################################################
+###
+### Prod
+###
+
+b-ios-prod:
+  stage: build
+  extends: .ruby-ios
+  environment:
+    name: prod
+  needs: ["init-ios"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cat $ENV_PROD > ./lib/environment_prod.dart
+    - rm -fv ../output/vega_dashboard-prod.ipa
+    - cd ios
+    - pod install
+    - echo "APP_IDENTIFIER=com.vega.dashboard CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_prod"
+    - APP_IDENTIFIER="com.vega.dashboard" bundle exec fastlane build_prod
+    - cp ./Runner.ipa ../../output/vega_dashboard-prod.ipa
+  tags:
+    - ios
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+d-apple-prod:
+  stage: deploy
+  environment:
+    name: prod
+  extends: .ruby-ios
+  needs: ["b-ios-prod"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd ios
+    - APP_IDENTIFIER="com.vega.dashboard" bundle exec fastlane deploy_prod_apple
+  tags:
+    - ios
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+b-android-prod:
+  stage: build
+  environment:
+    name: prod
+  extends: .ruby-android
+  needs: ["init-android"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cat $ENV_PROD > ./lib/environment_prod.dart
+    - rm -fv ../output/vega_dashboard-prod.aab
+    - cd android
+    - *update-google-service-json
+    - echo "APP_IDENTIFIER=com.vega.dashboard2 CI_PIPELINE_ID=$CI_PIPELINE_ID bundle exec fastlane build_prod"
+    - APP_IDENTIFIER="com.vega.dashboard2" bundle exec fastlane build_prod
+    - cp ../build/app/outputs/bundle/prodRelease/app-prod-release.aab ../../output/vega_dashboard-prod.aab
+    - >
+      if [ -d /data ]; then 
+        echo "Copying APK to /data"
+        cp -f ../build/app/outputs/flutter-apk/app-prod-release.apk /data/static-prod/vega_dashboard-prod.apk
+        echo $CI_PIPELINE_ID > /data/static-prod/vega_dashboard-prod.txt
+      fi
+  tags:
+    - android
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)_google$/
+
+d-google-prod:
+  stage: deploy
+  environment:
+    name: prod
+  extends: .ruby-android
+  needs: ["b-android-prod"]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - pwd
+    - cd android
+    - APP_IDENTIFIER="com.vega.dashboard2" bundle exec fastlane deploy_prod_google
+  tags:
+    - android
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+    - /^v_(\d+).(\d+)_(\d{6})(.)_google$/
+
+b-web-prod:
+  stage: build
+  environment:
+    name: prod
+  image: docker:latest
+  variables:
+    FLUTTER_ARGS: "./lib/main_prod.dart"
+    FLAVOR: "prod"
+  script:
+    - VERSION_NAME=$(echo "$CI_COMMIT_TAG" | sed -E 's/^.*_([0-9]+\.[0-9]+)_.*$/\1/')
+    - echo $VERSION_NAME
+    - cat $ENV_PROD > ./lib/environment_prod.dart
+    - cat $FCM_PROD > ./web/firebase-messaging-config.js
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg FLUTTER_ARGS=$FLUTTER_ARGS 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg VERSION_NAME=$VERSION_NAME 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+d-web-prod:
+  stage: deploy
+  environment:
+    name: prod
+  when: manual
+  allow_failure: false
+  image: docker:latest
+  needs: ["b-web-prod"]
+  variables:
+    FLAVOR: "prod"
+    PORT: "8082"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d -p $PORT:80
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-pluto-docker-1
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+# eof

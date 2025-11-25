@@ -1,0 +1,18 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Refresh token
+
+POST {{proto}}://{{host}}/v1/auth/refresh_token HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+{
+    "refreshToken": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJmYW0iOiIxNGIxNzQxZC1mNDdiLTQ1Y2ItOTg5NC03YTYwZjViZDY0MGQiLCJ1aWQiOiI5M2Q1ZjA0MC00NjNjLTRmZjgtYjI3Yi03ZTA5ODUxMjk4NWEiLCJpYXQiOjE2OTM0NzgzNTIsImV4cCI6MTcyNTAxNDM1Mn0.dSarom-fQyZO-3mhYiRubz72tFWFYyLind5JaUFm7NUaY94mx4bPvToetZxODVSFSIfeC8n633AO-2mgfZd-8Q"
+}

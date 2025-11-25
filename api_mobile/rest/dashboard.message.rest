@@ -1,0 +1,48 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+@cron_dev_api = {{$dotenv %CRON_DEV_API}}
+@dev_user_id = {{$dotenv %DEV_USER_ID}}
+@dev_installation_id = {{$dotenv %DEV_INSTALLATION_ID}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Helpers
+
+# MessageType.email: 1,
+# MessageType.pushNotification: 2,
+# MessageType.sms: 3,
+# MessageType.inApp: 4,
+# MessageType.whatsApp: 5,
+
+### Create message for delivery
+
+POST {{proto}}://{{host}}/v1/dashboard/message/for_delivery?target=1,2 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+x-dev-user-id: {{dev_user_id}}
+x-dev-installation-id: {{dev_installation_id}}
+
+{
+  "userId": "user1",
+  "body": "¡Hola!",
+  "subject": "¿Que tal?",
+  "email": "in@pridavok.com",
+  "deviceTokenD": "cva9UqyBEkQnljme3d8nHj:APA91bHM_aWgc6v-McHB3KJB7Engeb88zXXkb9srOxJY5BOTFPyZwscmA95z7a8j7dXhm5NHd2sjEAs455uRZ5jKdfXx7DAzBJqJfq9sEOSwO5q8piT3sXQiMEYC3-kpdMOWDEKLKpNz",
+  "deviceToken": "eS3j0Yr1oEi_i_CTQ6DGiu:APA91bHoAWKhYdleoBFi1RRPZJgY92yuYKkAZOnf67ShTo3DAdaL0ZechpEMY0bDAdXf56F0-C5qiPmemQm-BgnNXppiAsF07g521Ufmaq7UrMY3PuHHnMr5Mrr8YdqNf0Ey5l4sHTBO",
+  "phone": "phone",
+  "payload": {
+    "sample": "123"
+  }
+}
+
+### Process batch of delivery messages
+
+GET http://vega-dev-capi.brokenmatrix.intra/v1/delivery_messages?batch=100
+Content-Type: application/json
+X-API-Key: {{cron_dev_api}}
+
+
+# eof

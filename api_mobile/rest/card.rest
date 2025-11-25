@@ -1,0 +1,36 @@
+@proto = {{$dotenv %PROTO}}
+@host = {{$dotenv %HOST}}
+@key = {{$dotenv %API_KEY}}
+
+### Ping
+
+GET {{proto}}://{{host}}/ping HTTP/1.1
+
+### Ping
+
+GET http://192.168.1.5:8080/ping HTTP/1.1
+
+### List of cards for country
+
+GET {{proto}}://{{host}}/v1/card?cache=1684776419764 HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+### Top cards for user
+
+GET {{proto}}://{{host}}/v1/card/top?limit=10&noCache=true
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Dev-User-Id: admin1
+X-Dev-Installation-Id: admin1installation
+
+### Search for card
+
+GET {{proto}}://{{host}}/v1/card/search?xlimit=10&term=mar&otherCountries=true HTTP/1.1
+Content-Type: application/json
+X-API-Key: {{key}}
+X-Session: session1
+
+
+# eof

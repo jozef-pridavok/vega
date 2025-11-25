@@ -1,0 +1,195 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+################################################################################
+#
+# Dev
+#
+
+b-api-dev:
+  stage: build
+  image: docker:latest
+  variables:
+    FLAVOR: "dev"
+  script:
+    - cat $CONFIG_DEV > .env
+    - cat $FCM_APP_KEY_DEV > fcm_app_key_dev.json
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    #- /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - devel
+
+d-api-dev:
+  stage: deploy
+  image: docker:latest
+  variables:
+    FLAVOR: "dev"
+    port: "8071"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d 
+      -p $port:8000 -e TAG_NAME=$CI_COMMIT_TAG
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    #- /^dev_(\d+).(\d+)_(\d{6})(.)$/
+    - devel
+
+################################################################################
+#
+# Qa
+#
+
+b-api-qa:
+  stage: build
+  image: docker:latest
+  variables:
+    FLAVOR: "qa"
+  script:
+    - cat $CONFIG_QA > .env
+    - cat $FCM_APP_KEY_QA > fcm_app_key_qa.json
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+d-api-qa:
+  stage: deploy
+  image: docker:latest
+  variables:
+    FLAVOR: "qa"
+    port: "8072"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d 
+      -p $port:8000 -e TAG_NAME=$CI_COMMIT_TAG
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^qa_(\d+).(\d+)_(\d{6})(.)$/
+
+################################################################################
+#
+# Demo
+#
+
+b-api-demo:
+  stage: build
+  image: docker:latest
+  variables:
+    FLAVOR: "demo"
+  script:
+    - cat $CONFIG_DEMO > .env
+    - cat $FCM_APP_KEY_DEMO > fcm_app_key_demo.json
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+d-api-demo:
+  stage: deploy
+  image: docker:latest
+  variables:
+    FLAVOR: "demo"
+    port: "8073"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d 
+      -p $port:8000 -e TAG_NAME=$CI_COMMIT_TAG
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^demo_(\d+).(\d+)_(\d{6})(.)$/
+
+################################################################################
+#
+# Prod
+#
+
+b-api-prod:
+  stage: build
+  image: docker:latest
+  variables:
+    FLAVOR: "prod"
+  script:
+    - cat $CONFIG_PROD > .env
+    - cat $FCM_APP_KEY_PROD > fcm_app_key_prod.json
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - >
+      docker build -t $CI_REGISTRY_IMAGE:$FLAVOR 
+      --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN 
+      --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID 
+      --build-arg FLAVOR=$FLAVOR 
+      --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$FLAVOR
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/
+
+d-api-prod:
+  stage: deploy
+  when: manual
+  allow_failure: false
+  image: docker:latest
+  variables:
+    FLAVOR: "prod"
+    port: "8075"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker stop $CI_PROJECT_PATH_SLUG-$FLAVOR || true && docker rm $CI_PROJECT_PATH_SLUG-$FLAVOR || true
+    - >
+      docker run -d 
+      -p $port:8000 -e TAG_NAME=$CI_COMMIT_TAG
+      --restart always --name $CI_PROJECT_PATH_SLUG-$FLAVOR $CI_REGISTRY_IMAGE:$FLAVOR
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-pluto-docker-1
+  only:
+    - /^v_(\d+).(\d+)_(\d{6})(.)$/

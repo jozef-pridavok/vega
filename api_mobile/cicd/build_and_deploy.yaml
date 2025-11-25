@@ -1,0 +1,179 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+################################################################################
+#
+# Dev
+#
+
+b-api-dev:
+  stage: build
+  image: docker:latest
+  variables:
+    IMG_TAG: "dev"
+  script:
+    - cat $CONFIG_DEV_YAML > config.yaml
+    - >
+      sed -i "s/build: 1/build: $CI_PIPELINE_ID/g" config.yaml
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^dev_(\d{6})(.)$/
+    #- devel
+
+d-api-dev:
+  stage: deploy
+  image: docker:latest
+  variables:
+    IMG_TAG: "dev"
+    port: "8031"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      -v /data/static-dev:/data/static-dev:rw
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^dev_(\d{6})(.)$/
+    #- devel
+
+################################################################################
+#
+# Qa
+#
+
+b-api-qa:
+  stage: build
+  image: docker:latest
+  variables:
+    IMG_TAG: "qa"
+  script:
+    - cat $CONFIG_QA_YAML > config.yaml
+    - >
+      sed -i "s/build: 1/build: $CI_PIPELINE_ID/g" config.yaml
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^qa_(\d{6})(.)$/
+
+d-api-qa:
+  stage: deploy
+  image: docker:latest
+  variables:
+    IMG_TAG: "qa"
+    port: "8032"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      -v /data/static-qa:/data/static-qa:rw
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^qa_(\d{6})(.)$/
+
+################################################################################
+#
+# Demo
+#
+
+b-api-demo:
+  stage: build
+  image: docker:latest
+  variables:
+    IMG_TAG: "demo"
+  script:
+    - cat $CONFIG_DEMO_YAML > config.yaml
+    - >
+      sed -i "s/build: 1/build: $CI_PIPELINE_ID/g" config.yaml
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^demo_(\d{6})(.)$/
+
+d-api-demo:
+  stage: deploy
+  image: docker:latest
+  variables:
+    IMG_TAG: "demo"
+    port: "8033"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      -v /data/static-demo:/data/static-demo:rw
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-mercury-docker-1
+  only:
+    - /^demo_(\d{6})(.)$/
+
+################################################################################
+#
+# Prod
+#
+
+b-api-prod:
+  stage: build
+  image: docker:latest
+  variables:
+    IMG_TAG: "prod"
+  script:
+    - cat $CONFIG_PROD_YAML > config.yaml
+    - >
+      sed -i "s/build: 1/build: $CI_PIPELINE_ID/g" config.yaml
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$IMG_TAG --build-arg DEPLOY_USER_TOKEN=$DEPLOY_USER_TOKEN --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID --no-cache .
+    - docker push $CI_REGISTRY_IMAGE:$IMG_TAG
+  tags:
+    - shared-builder-docker-1
+  only:
+    - /^v_(\d{6})(.)$/
+
+d-api-prod:
+  stage: deploy
+  when: manual
+  allow_failure: false
+  image: docker:latest
+  variables:
+    IMG_TAG: "prod"
+    port: "8081"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker stop $CI_PROJECT_PATH_SLUG-$IMG_TAG || true && docker rm $CI_PROJECT_PATH_SLUG-$IMG_TAG || true
+    - >
+      docker run -d -p $port:8080
+      -v /data/static-prod:/data/static-prod:rw
+      --restart always --name $CI_PROJECT_PATH_SLUG-$IMG_TAG $CI_REGISTRY_IMAGE:$IMG_TAG
+    - docker logout $CI_REGISTRY
+  tags:
+    - shared-pluto-docker-1
+  only:
+    - /^v_(\d{6})(.)$/
